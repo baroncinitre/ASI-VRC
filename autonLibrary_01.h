@@ -61,7 +61,7 @@ void resetEncoders()
 	nMotorEncoder[backLeft] = 0;
 	nMotorEncoder[backRight] = 0;
 	SensorValue(liftEncoder) = 0;
-	SensorValue(armEncoder) = 0;
+	SensorValue(armPot) = 0;
 	SensorValue(frontLeft) = 0;
 	SensorValue(gyro) = 0;
 }
@@ -94,23 +94,23 @@ void openClaw()
 //raises the arms/claw
 void arms(int ticks, int speed)
 {
-	if(ticks > SensorValue(armEncoder)) //if it needs to go up, sets the speed to negative
+	while(SensorValue(armPot) < ticks)
 	{
-		while(SensorValue(armEncoder) < ticks)
-		{
-			motor[leftArm] = -speed;
-			motor[rightArm] = -speed;
-			armTicks = SensorValue(armEncoder);
-		}
+		motor[leftArm] = -speed;
+		motor[rightArm] = -speed;
+		armTicks = SensorValue(armPot);
 	}
-	else if(ticks < SensorValue(armEncoder)) //if it needs to go down, sets the speed to positive
+	motor[leftArm] = 0;
+	motor[rightArm] = 0;
+}
+
+void swingIn(int ticks, int speed)
+{
+	while(SensorValue(armPot) > ticks)
 	{
-		while(SensorValue(armEncoder) > ticks)
-		{
-			motor[leftArm] = speed;
-			motor[rightArm] = speed;
-			armTicks = SensorValue(armEncoder);
-		}
+		motor[leftArm] = speed;
+		motor[rightArm] = speed;
+		armTicks = SensorValue(armPot);
 	}
 	motor[leftArm] = 0;
 	motor[rightArm] = 0;
@@ -121,7 +121,19 @@ void lift(int height, int speed)
 {
 	motor[leftLift] = speed;
 	motor[rightLift] = speed;
-	while(SensorValue(pot) < height)
+	while(SensorValue(liftPot) < height)
+	{
+		returnValues();
+	}
+	motor[leftLift] = 0;
+	motor[rightLift] = 0;
+}
+
+void dropLift(int height, int speed)
+{
+	motor[leftLift] = -speed;
+	motor[rightLift] = -speed;
+	while(SensorValue(liftPot) > height)
 	{
 		returnValues();
 	}
@@ -130,7 +142,7 @@ void lift(int height, int speed)
 }
 
 //drops the lift
-void dropLift(int time)
+void timeDrop(int time)
 {
 	motor[leftLift] = -127;
 	motor[rightLift] = -127;
@@ -239,7 +251,6 @@ void move(float distance, int speed)
 			motor[backRight] = -speed;
 		}
 		returnValues();
-		brTicks = nMotorEncoder[frontLeft];
 	}
 	cut();
 }

@@ -4,14 +4,11 @@ void preAutonTasks()
 	resetEncoders();
 	SensorType[gyro] = sensorNone;
 	SensorType[gyro] = sensorGyro;
-	SensorType[armEncoder] = sensorNone;
-	SensorType[armEncoder] = sensorQuadEncoder;
 	SensorType[liftEncoder] = sensorNone;
 	SensorType[liftEncoder] = sensorQuadEncoder;
 	nMotorEncoder[leftArm] = 0;
 	wait1Msec(1000);
 	SensorValue[gyro] = 0;
-	SensorValue[armEncoder] = 0;
 	SensorValue[liftEncoder] = 0;
 
 	//while loop to enable lcd input
@@ -21,8 +18,8 @@ void preAutonTasks()
 		{
 		case 0:
 			//blue or red selection
-			displayLCDCenteredString(0, "Left = Blue");
-			displayLCDCenteredString(1, "Right = Red");
+			displayLCDCenteredString(0, "Left = blue");
+			displayLCDCenteredString(1, "Right = red");
 			waitForPress();
 			if(nLCDButtons == leftButton)
 			{
@@ -37,13 +34,13 @@ void preAutonTasks()
 			else if(nLCDButtons == centerButton)
 			{
 				waitForRelease();
-				driverSkills = true;
+				lcd = 9;
 			}
 			break;
 		case 1:
 			//blue side cones or mobile selection
-			displayLCDCenteredString(0, "Left = Cones");
-			displayLCDCenteredString(1, "Right = Mobile");
+			displayLCDCenteredString(0, "Left = cones");
+			displayLCDCenteredString(1, "Right = cobile");
 			waitForPress();
 			if(nLCDButtons == leftButton)
 			{
@@ -60,8 +57,8 @@ void preAutonTasks()
 			break;
 		case 2:
 			//blue side cones selection
-			displayLCDCenteredString(0, "Left: 1 Cone");
-			displayLCDCenteredString(1, "Right: 2 Cones");
+			displayLCDCenteredString(0, "Left: 1 cone");
+			displayLCDCenteredString(1, "Right: 2 cones");
 			waitForPress();
 			if(nLCDButtons == leftButton)
 			{
@@ -106,7 +103,7 @@ void preAutonTasks()
 			{
 				//sets autonomous to blue side ten point mobile goal drop
 				waitForRelease();
-				auton = 7;
+				auton = 6;
 				enter = 1;
 			}
 			else if(nLCDButtons == rightButton)
@@ -182,7 +179,7 @@ void preAutonTasks()
 			{
 				//sets autonomous to red side 10 point
 				waitForRelease();
-				//auton = ;
+				auton = 7;
 				enter = 1;
 			}
 			else if(nLCDButtons == rightButton)
@@ -193,6 +190,25 @@ void preAutonTasks()
 				enter = 1;
 			}
 			break;
+		case 9:
+			//skills selection
+			displayLCDCenteredString(0, "Left: Program");
+			displayLCDCenteredString(1, "Right: Skills");
+			waitForPress();
+			if(nLCDButtons == leftButton)
+			{
+				//activates programming skills
+				waitForRelease();
+				auton = 8;
+				enter = 1;
+			}
+			else if(nLCDButtons == rightButton)
+			{
+				//activates driver skills
+				waitForRelease();
+				skillsOn = true;
+				enter = 1;
+			}
 		}
 	}
 }

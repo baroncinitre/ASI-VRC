@@ -96,57 +96,19 @@ void armsControls()
 }
 
 //user control function to stack cones internally
-/*void stack()
+void internal()
 {
 	//stacks a cone internally
 	if(vexRT[Btn7U] == 1)
 	{
-		//declare variables that set the speed based on the encoder values relative to the desired values
-		int armSpeed, liftSpeed;
-
-		//set the arm speed positive if it needs to swing out, negative if otherwise
-		if(stackValues[1][stackHeight] > SensorValue(armEncoder))
+		if(stackHeight < 5)
 		{
-			armSpeed = 60;
+			lift(stackValues[0][stackHeight], 30);
+			arms(stackValues[1][stackHeight], 30);
+			dropLift(stackValues[2][stackHeight], 30);
+			//shifts the values used in stackValues over 1 to represent an additional cone on the mobile goal
+			stackHeight++;
 		}
-		else
-		{
-			armSpeed = -60;
-		}
-
-		//set the lift speed positive if it needs to move up, negative if otherwise
-		if(stackValues[0][stackHeight] > abs(SensorValue(liftEncoder)))
-		{
-			liftSpeed = 60;
-		}
-		else
-		{
-			liftSpeed = -60;
-		}
-
-		//while loop that runs the lift until it achieves the desired height based on the amount of stacked cones
-		while(SensorValue(liftEncoder) != stackValues[0][stackHeight])
-		{
-			motor[leftLift] = liftSpeed;
-			motor[rightLift] = liftSpeed;
-		}
-		motor[leftLift] = 0;
-		motor[rightLift] = 0;
-
-		//while loop that runs the arms until it achieves the desired value based on the amount of stacked cones
-		while(SensorValue(armEncoder) != stackValues[1][stackHeight])
-		{
-			motor[leftArm] = armSpeed;
-			motor[rightArm] = armSpeed;
-		}
-		motor[leftArm] = 0;
-		motor[rightArm] = 0;
-
-		//drops the cone onto the goal
-		openClaw();
-
-		//shifts the values used in stackValues over 1 to represent an additional cone on the mobile goal
-		stackHeight++;
 	}
 
 	//resets the values used in stackValues to represent 0 cones on the mobile goal
@@ -154,15 +116,26 @@ void armsControls()
 	{
 		stackHeight = 0;
 	}
-}*/
+}
+
+//function to enable lifting to the perfect height for a preload drop in driver skills
+void skillsMove()
+{
+	if(vexRT[Btn7L] == 1)
+	{
+		lift(2450, 80);
+		move(1625, 100);
+		mobileLift(mobileHigh);
+		openClaw();
+	}
+}
 
 //returns all encoder values to a global variable so we have access in the debugger
 void returnValues()
 {
 	liftTicks = SensorValue(liftEncoder);
-	armTicks = SensorValue(armEncoder);
+	armTicks = SensorValue(armPot);
 	mobileTicks = nMotorEncoder[mobile];
-	brTicks = nMotorEncoder[backRight];
 	flTicks = nMotorEncoder[frontLeft];
 	rangeFinderValue = SensorValue(rangeFinder);
 	backLeftSpeed = motor[backLeft];
@@ -172,5 +145,5 @@ void returnValues()
 	rightLiftSpeed = motor[rightLift];
 	leftArmSpeed = motor[leftArm];
 	rightArmSpeed = motor[rightArm];
-	potValue = SensorValue(pot);
+	potValue = SensorValue(liftPot);
 }
