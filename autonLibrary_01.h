@@ -87,7 +87,7 @@ void turn(float degree, int speed)
 void openClaw()
 {
 	motor[intake] = -60;
-	wait1Msec(500);
+	wait1Msec(650);
 	motor[intake] = 0;
 }
 

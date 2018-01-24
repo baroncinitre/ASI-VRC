@@ -7,7 +7,7 @@ int enter = 0;
 int skip = 0;
 int lcd = 0;
 int mobileLow = 50;
-int mobileHigh = 97;
+int mobileHigh = 103;
 int mobileMax = 135;
 int rangeFinderValue, potValue;
 int backLeftSpeed, frontRightSpeed, leftLiftSpeed, rightLiftSpeed, leftArmSpeed, rightArmSpeed;
