@@ -91,7 +91,7 @@ void openClaw()
 	motor[intake] = 0;
 }
 
-//raises the arms/claw
+//brings the arms out
 void arms(int ticks, int speed)
 {
 	while(SensorValue(armPot) < ticks)
@@ -104,7 +104,8 @@ void arms(int ticks, int speed)
 	motor[rightArm] = 0;
 }
 
-void swingIn(int ticks, int speed)
+//brings the arms in
+void armsIn(int ticks, int speed)
 {
 	while(SensorValue(armPot) > ticks)
 	{
@@ -116,7 +117,7 @@ void swingIn(int ticks, int speed)
 	motor[rightArm] = 0;
 }
 
-//raises or lowers the DR4B
+//raises the lift
 void lift(int height, int speed)
 {
 	motor[leftLift] = speed;
@@ -129,6 +130,7 @@ void lift(int height, int speed)
 	motor[rightLift] = 0;
 }
 
+//drops the lift
 void dropLift(int height, int speed)
 {
 	motor[leftLift] = -speed;
@@ -141,7 +143,7 @@ void dropLift(int height, int speed)
 	motor[rightLift] = 0;
 }
 
-//drops the lift
+//drops the lift based off of time
 void timeDrop(int time)
 {
 	motor[leftLift] = -127;
@@ -220,9 +222,10 @@ void brake(int speed)
 	cut();
 }
 
-void move(float distance, int speed)
+//moves the robot forward
+void tickMove(float distance, int speed)
 {
-	resetEncoders();
+	SensorValue(flEncoder) = 0;
 
 	motor[frontLeft] = speed;
 	motor[frontRight] = -speed;
@@ -231,8 +234,9 @@ void move(float distance, int speed)
 
 	SensorValue(gyro) = 0;
 
-	while(abs(nMotorEncoder[frontLeft]) <= distance)
+	while(abs(SensorValue(flEncoder)) <= distance)
 	{
+		//gyroscopic error correction
 		if(SensorValue(gyro) > 0)
 		{
 			motor[frontRight] = -speed - abs(SensorValue(gyro));
@@ -255,6 +259,43 @@ void move(float distance, int speed)
 	cut();
 }
 
+void move(float distance, int speed)
+{
+	resetEncoders();
+
+	motor[frontLeft] = speed;
+	motor[frontRight] = -speed;
+	motor[backLeft] = speed;
+	motor[backRight] = -speed;
+
+	SensorValue(gyro) = 0;
+
+	while(abs(nMotorEncoder[frontLeft]) <= distance)
+	{
+		//gyroscopic error correction
+		if(SensorValue(gyro) > 0)
+		{
+			motor[frontRight] = -speed - abs(SensorValue(gyro));
+			motor[backRight] = -speed - abs(SensorValue(gyro));
+		}
+		else if(SensorValue(gyro) < 0)
+		{
+			motor[frontLeft] = speed + abs(SensorValue(gyro));
+			motor[backLeft] = speed + abs(SensorValue(gyro));
+		}
+		if(SensorValue(gyro) == 0)
+		{
+			motor[frontLeft] = speed;
+			motor[frontRight] = -speed;
+			motor[backLeft] = speed;
+			motor[backRight] = -speed;
+		}
+		returnValues();
+	}
+	cut();
+}
+
+//backs the robot up
 void backUp(int ticks, int speed)
 {
 	resetEncoders();
@@ -266,6 +307,18 @@ void backUp(int ticks, int speed)
 	cut();
 }
 
+void tickBackUp(int ticks, int speed)
+{
+	SensorValue(flEncoder) = 0;
+	motor[frontLeft] = -speed;
+	motor[frontRight] = speed;
+	motor[backLeft] = -speed;
+	motor[backRight] = speed;
+	while(abs(SensorValue(flEncoder)) < ticks){}
+	cut();
+}
+
+//moves forward while raising the mobile goal lift
 void moveLift(int distance, int speed, int height, int lSpeed)
 {
 	resetEncoders();
@@ -274,6 +327,28 @@ void moveLift(int distance, int speed, int height, int lSpeed)
 	motor[backLeft] = speed;
 	motor[backRight] = -speed;
 	while(abs(nMotorEncoder[frontLeft]) < distance)
+	{
+		if(SensorValue(rangeFinder) < height)
+		{
+			motor[mobile] = lSpeed;
+		}
+		else
+		{
+			motor[mobile] = 0;
+		}
+	}
+	motor[mobile] = 0;
+	cut();
+}
+
+void tickMoveLift(int distance, int speed, int height, int lSpeed)
+{
+	SensorValue(flEncoder) = 0;
+	motor[frontLeft] = speed;
+	motor[frontRight] = -speed;
+	motor[backLeft] = speed;
+	motor[backRight] = -speed;
+	while(abs(SensorValue(flEncoder)) < distance)
 	{
 		if(SensorValue(rangeFinder) < height)
 		{

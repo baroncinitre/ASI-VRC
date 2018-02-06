@@ -2,6 +2,7 @@
 #pragma config(Sensor, in1,    gyro,           sensorGyro)
 #pragma config(Sensor, in2,    liftPot,        sensorPotentiometer)
 #pragma config(Sensor, in3,    armPot,         sensorPotentiometer)
+#pragma config(Sensor, dgtl1,  flEncoder,      sensorQuadEncoder)
 #pragma config(Sensor, dgtl3,  liftEncoder,    sensorQuadEncoder)
 #pragma config(Sensor, dgtl5,  rangeFinder,    sensorSONAR_mm)
 #pragma config(Sensor, I2C_1,  frontLeftEncoder, sensorQuadEncoderOnI2CPort,    , AutoAssign )
@@ -34,8 +35,7 @@
 
 void pre_auton()
 {
-	//preAutonTasks();
-	auton = 4;
+	preAutonTasks();
 	bStopTasksBetweenModes = true;
 }
 
@@ -156,38 +156,20 @@ task autonomous()
 		SensorValue(frontLeft) = 0;
 		SensorValue(gyro) = 0;
 		lift(2525, 80);
-		move(1700, 100);
+		tickMove(1700, 100);
 		brake(-60);
-		dropLift(2600, 40); //drop preload
+		mobileLift(mobileCarry);
 		openClaw();
-		holdOpen();
-		returnValues();
-		lift(2700, 80);
-		closeClaw();
-		arms(1325, 40);
-		openClaw();
-		holdOpen();
-		dropLift(2250, 80); //pick up second cone
-		closeClaw();
-		wait1Msec(500);
-		lift(2950, 80);
-		armsIn(425, 100);
-		dropLift(2900, 20); //drop second cone
-		openClaw();
-		holdOpen();
-		lift(4060, 80);
-		closeClaw();
-		mobileLift(mobileHigh);
-		backUp(825, 120);
+		lift(3000, 80);
+		tickBackUp(825, 120);
 		turn(165, -120);
 		turnBrake(120);
-		move(1100, 120);
-		brake(-60);
+		tickMove(900, 120);
+		tickMove(200, 60);
 		turn(42, -120);
 		turnBrake(120);
-		move(200, 127);
-		moveLift(700, 127, mobileMax, 127);
-		backUp(600, 127);
+		tickMoveLift(1025, 127, mobileHigh, 60);
+		tickBackUp(600, 127);
 		autonTime = time1[T1];
 		finished = true;
 		break;
@@ -201,27 +183,9 @@ task autonomous()
 		lift(2525, 80);
 		move(1700, 100);
 		brake(-60);
-		dropLift(2475, 80);
+		mobileLift(mobileCarry);
 		openClaw();
-		holdOpen();
-		armsIn(0, 100);
-		lift(2700, 80);
-		closeClaw();
-		arms(750, 40);
-		openClaw();
-		holdOpen();
-		dropLift(2700, 80);
-		closeClaw();
-		wait1Msec(500);
-		lift(2700, 80);
-		armsIn(100, 60);
-		dropLift(2270, 80);
-		armsIn(0, 100);
-		openClaw();
-		holdOpen();
-		lift(3500, 80);
-		closeClaw();
-		mobileLift(mobileHigh);
+		lift(3000, 80);
 		backUp(725, 120);
 		backUp(100, 30);
 		turn(165, 120);
@@ -230,7 +194,7 @@ task autonomous()
 		move(200, 60);
 		turn(42, 120);
 		turnBrake(-120);
-		move(925, 127);
+		moveLift(925, 127, mobileHigh, 60);
 		backUp(600, 127);
 		autonTime = time1[T1];
 		finished = true;
@@ -243,30 +207,11 @@ task autonomous()
 		SensorValue(frontLeft) = 0;
 		SensorValue(gyro) = 0;
 		wait1Msec(2000);
-		lift(2525, 80);
+		lift(2500, 80);
 		move(1700, 100);
 		brake(-60);
-		dropLift(2475, 80);
+		mobileLift(mobileCarry);
 		openClaw();
-		holdOpen();
-		armsIn(0, 100);
-		lift(2700, 80);
-		closeClaw();
-		arms(750, 40);
-		openClaw();
-		holdOpen();
-		dropLift(2700, 80);
-		closeClaw();
-		wait1Msec(500);
-		lift(2700, 80);
-		armsIn(100, 60);
-		dropLift(2270, 80);
-		armsIn(0, 100);
-		openClaw();
-		holdOpen();
-		lift(3500, 80);
-		closeClaw();
-		mobileLift(mobileHigh);
 		backUp(725, 120);
 		backUp(100, 30);
 		turn(165, -120);
@@ -288,30 +233,11 @@ task autonomous()
 		SensorValue(frontLeft) = 0;
 		SensorValue(gyro) = 0;
 		wait1Msec(2000);
-		lift(2525, 80);
-		move(1700, 100);
+		lift(2500, 80);
+		move(1700, 80);
 		brake(-60);
-		dropLift(2475, 80);
+		mobileLift(mobileCarry);
 		openClaw();
-		holdOpen();
-		armsIn(0, 100);
-		lift(2700, 80);
-		closeClaw();
-		arms(750, 40);
-		openClaw();
-		holdOpen();
-		dropLift(2700, 80);
-		closeClaw();
-		wait1Msec(500);
-		lift(2700, 80);
-		armsIn(100, 60);
-		dropLift(2270, 80);
-		armsIn(0, 100);
-		openClaw();
-		holdOpen();
-		lift(3500, 80);
-		closeClaw();
-		mobileLift(mobileHigh);
 		backUp(725, 120);
 		backUp(100, 30);
 		turn(165, 120);
@@ -337,7 +263,7 @@ task autonomous()
 		lift(3300, 120);
 		move(1050, 100);
 		wait1Msec(500);
-		mobileLift(mobileHigh);
+		mobileLift(mobileCarry);
 		timeDrop(400);
 		openClaw();
 		holdOpen();
@@ -351,7 +277,7 @@ task autonomous()
 		move(550, 90);
 		turn(75.5, 90);
 		turnBrake(-90);
-		moveLift(975, 127, mobileHigh, 75);//score 22
+		moveLift(975, 127, mobileCarry, 75);//score 22
 		backUp(600, 127);
 		turn(96, -90);
 		turnBrake(90);
@@ -360,7 +286,7 @@ task autonomous()
 		turnBrake(90);
 		mobileLift(mobileLow);
 		move(850, 100);
-		mobileLift(mobileHigh);
+		mobileLift(mobileCarry);
 		turn(187, 90);
 		turnBrake(-90);
 		moveLift(1500, 120, 130,  127);//score 10
@@ -376,7 +302,7 @@ task autonomous()
 		brake(-60);
 		move(400, 120);
 		brake(-60);
-		mobileLift(mobileHigh);
+		mobileLift(mobileCarry);
 		openClaw();
 		backUp(900, 120);
 		backUp(100, 30);

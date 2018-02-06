@@ -1,4 +1,4 @@
-//all variable declarations and autonomous functions
+//all variable declarations
 const short leftButton = 1;
 const short centerButton = 2;
 const short rightButton = 4;
@@ -7,7 +7,8 @@ int enter = 0;
 int skip = 0;
 int lcd = 0;
 int mobileLow = 50;
-int mobileHigh = 103;
+int mobileCarry = 109;
+int mobileHigh = 115;
 int mobileMax = 135;
 int rangeFinderValue, potValue;
 int backLeftSpeed, frontRightSpeed, leftLiftSpeed, rightLiftSpeed, leftArmSpeed, rightArmSpeed;
