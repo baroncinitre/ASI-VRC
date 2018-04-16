@@ -56,14 +56,14 @@ void cut()
 //resets the motor encoders
 void resetEncoders()
 {
-	nMotorEncoder[frontLeft] = 0;
-	nMotorEncoder[frontRight] = 0;
-	nMotorEncoder[backLeft] = 0;
-	nMotorEncoder[backRight] = 0;
 	SensorValue(liftEncoder) = 0;
 	SensorValue(armPot) = 0;
 	SensorValue(frontLeft) = 0;
 	SensorValue(gyro) = 0;
+	nMotorEncoder[frontLeft] = 0;
+	nMotorEncoder[frontRight] = 0;
+	nMotorEncoder[backLeft] = 0;
+	nMotorEncoder[backRight] = 0;
 }
 
 //rotates the robot
@@ -87,7 +87,7 @@ void turn(float degree, int speed)
 void openClaw()
 {
 	motor[intake] = -60;
-	wait1Msec(650);
+	wait1Msec(600);
 	motor[intake] = 0;
 }
 
@@ -111,7 +111,7 @@ void armsIn(int ticks, int speed)
 	{
 		motor[leftArm] = speed;
 		motor[rightArm] = speed;
-		armTicks = SensorValue(armPot);
+		returnValues();
 	}
 	motor[leftArm] = 0;
 	motor[rightArm] = 0;
@@ -223,44 +223,9 @@ void brake(int speed)
 }
 
 //moves the robot forward
-void tickMove(float distance, int speed)
-{
-	SensorValue(flEncoder) = 0;
-
-	motor[frontLeft] = speed;
-	motor[frontRight] = -speed;
-	motor[backLeft] = speed;
-	motor[backRight] = -speed;
-
-	SensorValue(gyro) = 0;
-
-	while(abs(SensorValue(flEncoder)) <= distance)
-	{
-		//gyroscopic error correction
-		if(SensorValue(gyro) > 0)
-		{
-			motor[frontRight] = -speed - abs(SensorValue(gyro));
-			motor[backRight] = -speed - abs(SensorValue(gyro));
-		}
-		else if(SensorValue(gyro) < 0)
-		{
-			motor[frontLeft] = speed + abs(SensorValue(gyro));
-			motor[backLeft] = speed + abs(SensorValue(gyro));
-		}
-		if(SensorValue(gyro) == 0)
-		{
-			motor[frontLeft] = speed;
-			motor[frontRight] = -speed;
-			motor[backLeft] = speed;
-			motor[backRight] = -speed;
-		}
-		returnValues();
-	}
-	cut();
-}
-
 void move(float distance, int speed)
 {
+	returnValues();
 	resetEncoders();
 
 	motor[frontLeft] = speed;
@@ -269,9 +234,20 @@ void move(float distance, int speed)
 	motor[backRight] = -speed;
 
 	SensorValue(gyro) = 0;
+	nMotorEncoder[backLeft] = 0;
 
-	while(abs(nMotorEncoder[frontLeft]) <= distance)
+	clearTimer(T2);
+
+	while(abs(nMotorEncoder[backLeft]) <= distance)
 	{
+		//if(time1[T2] >= 500)
+		//{
+		//	if(nMotorEncoder[backRight] < 50 && time1[T2] <= 750)
+		//	{
+		//		breakAuton = true;
+		//		break;
+		//	}
+		//}
 		//gyroscopic error correction
 		if(SensorValue(gyro) > 0)
 		{
@@ -283,7 +259,7 @@ void move(float distance, int speed)
 			motor[frontLeft] = speed + abs(SensorValue(gyro));
 			motor[backLeft] = speed + abs(SensorValue(gyro));
 		}
-		if(SensorValue(gyro) == 0)
+		else if(SensorValue(gyro) == 0)
 		{
 			motor[frontLeft] = speed;
 			motor[frontRight] = -speed;
@@ -298,35 +274,27 @@ void move(float distance, int speed)
 //backs the robot up
 void backUp(int ticks, int speed)
 {
+	returnValues();
 	resetEncoders();
+	nMotorEncoder[backLeft] = 0;
 	motor[frontLeft] = -speed;
 	motor[frontRight] = speed;
 	motor[backLeft] = -speed;
 	motor[backRight] = speed;
-	while(abs(nMotorEncoder[frontLeft]) < ticks){}
-	cut();
-}
-
-void tickBackUp(int ticks, int speed)
-{
-	SensorValue(flEncoder) = 0;
-	motor[frontLeft] = -speed;
-	motor[frontRight] = speed;
-	motor[backLeft] = -speed;
-	motor[backRight] = speed;
-	while(abs(SensorValue(flEncoder)) < ticks){}
+	while(abs(nMotorEncoder[backLeft]) < ticks){}
 	cut();
 }
 
 //moves forward while raising the mobile goal lift
 void moveLift(int distance, int speed, int height, int lSpeed)
 {
+	returnValues();
 	resetEncoders();
 	motor[frontLeft] = speed;
 	motor[frontRight] = -speed;
 	motor[backLeft] = speed;
 	motor[backRight] = -speed;
-	while(abs(nMotorEncoder[frontLeft]) < distance)
+	while(abs(nMotorEncoder[backLeft]) < distance)
 	{
 		if(SensorValue(rangeFinder) < height)
 		{
@@ -341,24 +309,23 @@ void moveLift(int distance, int speed, int height, int lSpeed)
 	cut();
 }
 
-void tickMoveLift(int distance, int speed, int height, int lSpeed)
+void rollIn()
 {
-	SensorValue(flEncoder) = 0;
-	motor[frontLeft] = speed;
-	motor[frontRight] = -speed;
-	motor[backLeft] = speed;
-	motor[backRight] = -speed;
-	while(abs(SensorValue(flEncoder)) < distance)
+	nMotorEncoder[intake] = 0;
+	motor[intake] = 127;
+	while(SensorValue[coneButton] != 0)
 	{
-		if(SensorValue(rangeFinder) < height)
-		{
-			motor[mobile] = lSpeed;
-		}
-		else
-		{
-			motor[mobile] = 0;
-		}
+		returnValues();
 	}
-	motor[mobile] = 0;
-	cut();
+	motor[intake] = 0;
+}
+
+void rollOut()
+{
+	motor[intake] = -127;
+}
+
+void stopRoller()
+{
+	motor[intake] = 0;
 }
